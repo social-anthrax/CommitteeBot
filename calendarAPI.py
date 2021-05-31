@@ -1,5 +1,6 @@
 from __future__ import print_function
 import datetime
+import dateparser
 import os.path
 from googleapiclient.discovery import Resource, build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -7,8 +8,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
-
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+compsocCalendar = 'comp-soc.com_1k2f1gda8js9nav1ilr5g5h6vk@group.calendar.google.com'
 
 def authorize():
     """Shows basic usage of the Google Calendar API.
@@ -35,12 +36,45 @@ def authorize():
     return build('calendar', 'v3', credentials=creds)
 
 
-
+def addEvent(self, start: datetime, end:datetime):
+    start = start.isoformat()
+    end = end.isoformat()
+    event = {
+        'summary': 'CompSoc Committee meeting',
+        'location': '',
+        'description': '',
+        'start': {
+            'dateTime': start,
+            'timeZone': 'GB',
+        },
+        'end': {
+            'dateTime': end,
+            'timeZone': 'GB',
+        },
+        
+        "conferenceData": {
+            "createRequest": {
+                "conferenceSolutionKey": {
+                    "type": "hangoutsMeet"
+                },
+                "requestId": "CompSoc-Meet" + str(start)
+            }
+        },
+        'reminders': {
+            'useDefault': False,
+            'overrides': [
+                {'method': 'email', 'minutes': 24 * 60},
+                {'method': 'popup', 'minutes': 10},
+            ],
+        },
+    }
+    event = self.events().insert(calendarId=compsocCalendar, body=event, conferenceDataVersion=1).execute()
+    return('Event created: %s' % event.get('htmlLink'))
 
 def getEvents(self, results):
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    events_result = self.events().list(calendarId='comp-soc.com_1k2f1gda8js9nav1ilr5g5h6vk@group.calendar.google.com', timeMin=now,
+    events_result = self.events().list(calendarId=compsocCalendar, timeMin=now,
                                           maxResults=results, singleEvents=True,
                                           orderBy='startTime').execute()
     events = events_result.get('items', [])
@@ -49,11 +83,13 @@ def getEvents(self, results):
         return 'No upcoming events found.'
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        return '\n'.join(start.split('T')) + '\n' + event['summary'] + '\n' + event["hangoutLink"]
+        return '\n'.join(start.split('T')) + '\n' + event['summary'] + '\n' + event['hangoutLink']
 
 
 Resource.getEvents = getEvents
+Resource.addEvent = addEvent
 
 if __name__ == '__main__':
     service = authorize()
+    service.addEvent(dateparser.parse('2021-05-31T20:24:00'), dateparser.parse('2021-05-31T21:24:00'))
     print(service.getEvents(2))

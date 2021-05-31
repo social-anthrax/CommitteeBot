@@ -1,14 +1,11 @@
-from __future__ import print_function
 import discord
 from discord.ext import commands
 from discord.ext.commands.core import command
 import datetime
-import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from dateparser import parse
 import calendarAPI
+
+COMMITTEECHAT = 828691588766761021
 
 description = '''A bot to help organise committee meetings'''
 
@@ -30,8 +27,18 @@ async def on_ready():
     
 
 @bot.command()
+async def addMeeting(ctx, start, end):
+    start = parse(start)
+    end = parse(end)
+    if ctx.channel.id == COMMITTEECHAT:
+        await ctx.send(calService.addEvent(start, end))
+    else: 
+        await ctx.send("Not in <#828691588766761021>")
+
+
+@bot.command()
 async def meeting(ctx):
-    if ctx.channel.id == 828691588766761021:
+    if ctx.channel.id == COMMITTEECHAT:
         await ctx.send(calService.getEvents(1))
     else:
         await ctx.send("Not in <#828691588766761021>")
