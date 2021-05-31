@@ -12,9 +12,6 @@ SCOPES = ['https://www.googleapis.com/auth/calendar']
 compsocCalendar = 'comp-soc.com_1k2f1gda8js9nav1ilr5g5h6vk@group.calendar.google.com'
 
 def authorize():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -91,6 +88,7 @@ def getEvents(self, results):
 Resource.getEvents = getEvents
 Resource.addEvent = addEvent
 
+#example to test if credentials work
 if __name__ == '__main__':
     service = authorize()
     service.addEvent(datetime.datetime.utcnow(), dateparser.parse('2021-05-31T21:24:00'))
