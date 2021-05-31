@@ -3,7 +3,7 @@ A quickly developed discord bot used to help the running of CompSoc
 
 Current functions include 
 
-`>addEvent "<time>"'  ~ Adds an event into a shared google calendar together with a google meets link
+`>addEvent "<time>"`  ~ Adds an event into a shared google calendar together with a google meets link
 
 `>meeting`            ~ Sends detail of next meeting. The bot will start fetching events from 15 minutes prior so that any late requests still show the meeting link
 
