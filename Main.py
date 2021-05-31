@@ -1,7 +1,9 @@
+import time
 import discord
 from discord.ext import commands
 from discord.ext.commands.core import command
-import datetime
+
+from datetime import timedelta
 from dateparser import parse
 import calendarAPI
 
@@ -27,9 +29,14 @@ async def on_ready():
     
 
 @bot.command()
-async def addMeeting(ctx, start, end):
+async def addEvent(ctx, start):
     start = parse(start)
-    end = parse(end)
+
+    if start == None:
+        ctx.send("Conversion Failed")
+
+    end = start + timedelta(hours=1)
+
     if ctx.channel.id == COMMITTEECHAT:
         await ctx.send(calService.addEvent(start, end))
     else: 

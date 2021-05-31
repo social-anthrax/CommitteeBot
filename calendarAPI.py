@@ -73,7 +73,9 @@ def addEvent(self, start: datetime, end:datetime):
 
 def getEvents(self, results):
     # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    # Decrease time by 15 minutes so that late meeting still display
+    now = (datetime.datetime.utcnow() - datetime.timedelta(minutes=15)
+        ).isoformat() + 'Z'  # 'Z' indicates UTC time
     events_result = self.events().list(calendarId=compsocCalendar, timeMin=now,
                                           maxResults=results, singleEvents=True,
                                           orderBy='startTime').execute()
@@ -91,5 +93,5 @@ Resource.addEvent = addEvent
 
 if __name__ == '__main__':
     service = authorize()
-    service.addEvent(dateparser.parse('2021-05-31T20:24:00'), dateparser.parse('2021-05-31T21:24:00'))
+    service.addEvent(datetime.datetime.utcnow(), dateparser.parse('2021-05-31T21:24:00'))
     print(service.getEvents(2))
